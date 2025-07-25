@@ -1,286 +1,561 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="cs">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivní Manuál pro Servisní Techniky</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate & Amber -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar navigation for switching between the four main training modules (Základy, Herní Konzole, Apple iPhone, Zkouška). This structure allows users to quickly jump to any relevant section without linear scrolling, which is more effective for a reference manual. Inside each module, content is organized using cards, accordions, and interactive elements. For example, the "Herní Konzole" section features an interactive chart to compare common faults, making data easily digestible. The diagnostic funnel is visualized as a step-by-step diagram instead of a simple list, enhancing comprehension. This task-oriented, non-linear structure was chosen because technicians often need to look up specific information quickly, rather than reading the manual from start to finish. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Typical faults for PS4/PS5/Xbox. Goal: Compare frequencies. Viz: Interactive Bar Chart (Chart.js). Interaction: Buttons to switch datasets. Justification: A chart provides a much faster and more intuitive comparison of fault types than a text list. No SVG/Mermaid.
+        - Report Info: Diagnostic Funnel steps. Goal: Show a process. Viz: Styled HTML/CSS diagram. Interaction: None, static visual. Justification: A visual flowchart is more memorable and easier to follow than a numbered list. No SVG/Mermaid.
+        - Report Info: EPA Checklist. Goal: Provide a daily tool. Viz: HTML Table. Interaction: None. Justification: A clear, simple table is the most practical format for a checklist. No SVG/Mermaid.
+        - Report Info: Detailed repair procedures. Goal: Organize complex info. Viz: Accordion/Toggleable cards (HTML/JS). Interaction: Click to expand/collapse. Justification: Hides complex details by default, reducing cognitive load and allowing users to focus on the specific step they need. No SVG/Mermaid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .main-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #f59e0b; /* amber-500 */
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #f1f5f9; /* slate-100 */
+            color: #1e293b; /* slate-800 */
+        }
+        .content-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+        .accordion-header {
+            cursor: pointer;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .step-circle {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+        .step-arrow {
+            font-size: 2rem;
+            color: #94a3b8; /* slate-400 */
+        }
+    </style>
 </head>
-<body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="cs"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Interaktivní přehled servisních úkonů&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Chosen Palette: Warm Neutrals (Slate, Stone, Sky) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Application Structure Plan: Cílem je přeměnit statickou tabulku na dynamický nástroj. Struktura je navržena jako dashboard. Na levé straně (na větších obrazovkách) je ovládací panel s grafickým přehledem kategorií a filtry. Graf umožňuje rychlý pohled na objem úkonů v jednotlivých sekcích a je interaktivní – kliknutím na kategorii se vyfiltruje seznam. Hlavní část stránky zobrazuje jednotlivé servisní úkony jako karty, které lze filtrovat pomocí tlačítek kategorií a fulltextového vyhledávání (včetně nově přidaných SK kódů). Tento design byl zvolen, protože umožňuje uživatelům (např. technikům) rychle najít potřebný standardizovaný popis opravy a jeho SK kód, ať už procházením kategorií, nebo přímým vyhledáváním klíčových slov či SK, což výrazně zrychluje jejich práci. --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Visualization &amp; Content Choices: Data jsou primárně textová a kategorická. Pro vizualizaci byl zvolen horizontální sloupcový graf (Chart.js), který ukazuje počet definovaných úkonů v každé kategorii. Cíl: Porovnání. Interakce: Kliknutí na sloupec filtruje karty. Jednotlivé úkony jsou prezentovány jako karty (HTML/Tailwind), které nyní obsahují i SK kód. Cíl: Organizace a informování. Interakce: Filtrování a vyhledávání (JS), rozšířené o SK kódy. Tento přístup je optimální pro rychlou orientaci a vyhledávání v textových datech. --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.chart-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 600px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-left: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-right: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 320px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-height: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (min-width: 1024px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.chart-container {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>height: 350px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.task-card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.task-card:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-4px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.filter-btn.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #0284c7; /* sky-600 */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body class="bg-slate-50 text-slate-800"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container mx-auto p-4 md:p-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;header class="text-center mb-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1 class="text-3xl md:text-4xl font-bold text-slate-900"&gt;Přehled servisních úkonů&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="mt-2 text-lg text-slate-600"&gt;Interaktivní nástroj pro rychlé vyhledávání standardizovaných popisů oprav a SK kódů.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="grid grid-cols-1 lg:grid-cols-4 gap-8"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;aside class="lg:col-span-1 p-6 bg-white rounded-xl shadow-sm"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="prose prose-slate max-w-none mb-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 class="text-xl font-semibold mb-4 text-slate-900"&gt;Navigace a přehled&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p&gt;Tento panel slouží k rychlé orientaci a filtrování servisních úkonů. Můžete využít graf pro vizuální přehled kategorií, vybrat konkrétní kategorii pomocí tlačítek, nebo vyhledat úkon podle klíčového slova či SK kódu.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="chart-container mb-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;canvas id="categoryChart"&gt;&lt;/canvas&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="search" class="block text-sm font-medium text-slate-700 mb-2"&gt;Vyhledat úkon (popis, SK):&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="text" id="search" placeholder="Např. baterie, S0033..." class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mt-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 class="text-md font-semibold text-slate-800 mb-3"&gt;Filtrovat podle kategorie:&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="filter-buttons" class="flex flex-wrap gap-2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/aside&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;main class="lg:col-span-3"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                 </span>&lt;div class="prose prose-slate max-w-none mb-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 class="text-xl font-semibold text-slate-900"&gt;Seznam úkonů&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p&gt;Zde naleznete detailní seznam všech servisních úkonů. Každá karta reprezentuje jeden standardizovaný úkon. Pro zobrazení pouze relevantních položek použijte filtry v navigačním panelu.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="tasks-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/main&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const serviceTasksData = [</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0033', category: 'Playstation', internal: 'LB1 - jedná se o výměnu HDD/SSD', external: 'Pro zákazníka výměna pevného disku' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0034', category: 'Playstation', internal: 'LB2 - jedná se o výměnu HDD/SSD u PS4 + výměna dvou potenciometrů u ovladačů', external: 'Pro zákazníka výměna ventilátoru, zdroje, mechaniky u PS4, nebo výměna dvou potenciometrů u jakéhokoliv playstation ovladače' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0035', category: 'Playstation', internal: 'LB3 - jedná se o výměnu více dílů u PS4 nebo výměnu jednoho dílu u PS5', external: 'Pro zákazníka výměna ventilátoru a zdroje a mechaniky zároveň u PS4, nebo výměna ventilátoru, zdroje, mechaniky u PS5' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0045', category: 'Playstation', internal: 'LB5 - jedná se o opravu ovladače', external: 'Pro zákazníka výměna jednoho potenciometru, výměna nabíjecího portu, výměna kloboučků, výměna tlačítek, výměna krytu ovladače' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0042', category: 'Xbox', internal: 'LB1 - jedná se o výměnu HDD/SSD u Xbox konzolí', external: 'Pro zákazníka výměna pevného disku' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0043', category: 'Xbox', internal: 'LB2 - jedná se o výměnu jednoho dílu u Xbox ONE/ Series S', external: 'Pro zákazníka výměna ventilátoru, zdroje, mechaniky u Xboxu ONE/ Series S' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0044', category: 'Xbox', internal: 'LB3 - jedná se o výměnu více dílů u Xbox ONE/Series S nebo jednoho dílu Xbox Series X', external: 'Pro zákazníka výměna ventilátoru a zdroje a mechaniky zároveň u Xboxu ONE/ Series S, nebo výměna ventilátoru, zdroje, mechaniky' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0037', category: 'Xbox', internal: 'LB5 - jedná se o opravu ovladačů Xbox', external: 'Pro zákazníka výměna jednoho potenciometru, výměna nabíjecího portu, výměna kloboučků, výměna tlačítek, výměna krytu ovladače' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0036', category: 'Nintendo', internal: 'LB4-jedná se o opravu konzolí nintendo', external: 'Pro zákazníka výměna baterie, větráku, čtečky herních karet, čtečky paměťových karet, kolejnic' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0038', category: 'Nintendo', internal: 'LB6-jedná se o opravu Joy-Con/ovladačů nintendo', external: 'Pro zákazníka výměna jednoho potenciometru, výměna baterie, výměna tlačítek, výměna krytu ovladače, výměna kolejnic' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S8800', category: 'Diagnostiky a čištění', internal: 'Diagnostika ovladače', external: 'Pro zákazníka Diagnostika ovladače' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S6605', category: 'Diagnostiky a čištění', internal: 'Diagnostika konzole', external: 'Pro zákazníka Diagnostika konzole' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S8804', category: 'Diagnostiky a čištění', internal: 'Update/reinstalace operačního systému konzole', external: 'Pro zákazníka Update/reinstalace operačního systému konzole' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S8777', category: 'Diagnostiky a čištění', internal: 'Čištění a přepastování konzolí PS4,PS5,Xbox One,X,S', external: 'Pro zákazníka Čištění a přepastování konzolí PS4,PS5,Xbox One,X,S' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0159', category: 'Diagnostiky a čištění', internal: 'Zpracování výkupu technikem na prodejně Konzole, Apple Watch', external: 'Pro zákazníka Zpracování výkupu technikem na prodejně Konzole, Apple Watch' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0050', category: 'Výkupy', internal: 'LB1 - jedná se o výměnu HDD/SSD, opravy Joy-Con/ovladačů nintendo', external: 'Pro zákazníka výměna pevného disku, výměna jednoho potenciometru, výměna baterie, výměna tlačítek, výměna krytu ovladače, výměna kolejnic' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0051', category: 'Výkupy', internal: 'LB2 - jedná se o opravu ovladačů Xbox,PS, oprava konzolí Nintendo 1 potenciometr (17 znaků v Able)', external: 'Pro zákazníka výměna jednoho potenciometru u všech ovladačů nebo výměna jednoho dílu u Nintendo konzole' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0052', category: 'Výkupy', internal: 'LB3 - oprava mechaniky PS/Xbox nebo čištění + přepastování (13 znaků v Able)', external: 'Pro zákazníka výměna mechaniky všechny Playstationy nebo všechny Xboxy, čištění a přepastování konzole' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0053', category: 'Výkupy', internal: 'LB4 - výměna více dílů u konzolí + výměna dvou potenciometrů u ovladačů (13 znaků v Able)', external: 'Pro zákazníka výměna ventilátoru a zdroje a mechaniky zároveň u všech konzolí nebo výměna dvou potenciometrů u všech ovladačů' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0019', category: 'iPhony/Mac', internal: 'Reinstalace iOS', external: 'Pro zákazníka Reinstalace iOS' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0003', category: 'iPhony/Mac', internal: 'Reinstalace MacOS', external: 'Pro zákazníka Reinstalace MacOS' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0001', category: 'iPhony/Mac', internal: 'Diagnostika zařízení a čištění iOS/Android', external: 'Pro zákazníka Diagnostika zařízení a čištění iOS/Android' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0102', category: 'iPhony/Mac', internal: 'Diagnostika zařízení a čištění Airpods/EarPods', external: 'Pro zákazníka Diagnostika zařízení a čištění Airpods/EarPods' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0160', category: 'iPhony/Mac', internal: 'Diagnostika a čištění DEMO a vratek', external: 'Pro zákazníka Diagnostika a čištění DEMO a vratek' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0158', category: 'iPhony/Mac', internal: 'Zpracování výkupu na prodejně technikem iPhone, Android, Mac', external: 'Pro zákazníka Zpracování výkupu na prodejně technikem iPhone, Android, Mac' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0018', category: 'iPhony/Mac', internal: 'Kontrola výkupu diagnostika a čištění následné odesílání např na jinou prodejnu', external: 'Pro zákazníka Kontrola výkupu diagnostika a čištění následné odesílání např na jinou prodejnu' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0031', category: 'iPhony/Mac', internal: 'Zamítnutí záruční reklamace', external: 'Pro zákazníka Zamítnutí záruční reklamace' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: '15642', category: 'iPhony/Mac', internal: 'Pokud díl není naskladněný a potřebuješ si zaúčtovat cenu opravy - použij tuto skladovou kartu', external: 'Pro zákazníka Pokud díl není naskladněný a potřebuješ si zaúčtovat cenu opravy - použij tuto skladovou kartu' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0021', category: 'iPhony/Mac', internal: 'Zamítnutí reklamace ze strany zákazníka', external: 'Pro zákazníka Zamítnutí reklamace ze strany zákazníka' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: '196266', category: 'iPhony/Mac', internal: 'Zprostředkování služby konzultantem', external: 'Pro zákazníka Zprostředkování služby konzultantem' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0063', category: 'iPhony/Mac', internal: 'Jakýkoliv díl na iPhone 6-11 (včetně pro modelů) pro ZKZ', external: 'Pro zákazníka výměna baterie, displeje, reproduktoru, tlačítek, nabíjecí cívky - jednotlivě u modelů iPhonů 6 až 11' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0064', category: 'iPhony/Mac', internal: 'Jakýkoliv díl na iPhone 12 a výše nebo výměna 2 dílů na jakém koliv modelu pro ZKZ', external: 'Pro zákazníka výměna baterie, displeje, reproduktoru, tlačítek, nabíjecí cívky - jednotlivě u modelů iPhonů 12 a dále, výměna displeje' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0065', category: 'iPhony/Mac', internal: 'Výměna housingu na jakýkoliv model - Platí jak u výkupu tak pro ZKZ', external: 'Pro zákazníka Výměna housingu na jakýkoliv model - Platí jak u výkupu tak pro ZKZ' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0016', category: 'iPhony/Mac', internal: 'Výměna jednoho dílu u iPhonu 6-11 (včetně pro modelů) u výkupu', external: 'Pro zákazníka výměna baterie, displeje, reproduktoru, tlačítek, nabíjecí cívky - jednotlivě u modelů iPhonů 6 až 11' },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{ sku: 'S0017', category: 'iPhony/Mac', internal: 'Výměna jednoho dílu u iPhonu 12 a výš nebo 2 dílů na jakém koliv modelu u výkupu', external: 'Pro zákazníka výměna baterie, displeje, reproduktoru, tlačítek, nabíjecí cívky - jednotlivě u modelů iPhonů 12 a dále, výměna displeje a baterie zároveň' },</p>
-<p class="p1"><span class="Apple-converted-space">        </span>];</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('DOMContentLoaded', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const tasksGrid = document.getElementById('tasks-grid');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const filterButtonsContainer = document.getElementById('filter-buttons');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const searchInput = document.getElementById('search');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const categories = [...new Set(serviceTasksData.map(task =&gt; task.category))];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let activeFilter = 'Vše';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>function renderCards() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>tasksGrid.innerHTML = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const searchTerm = searchInput.value.toLowerCase();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>serviceTasksData</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.filter(task =&gt; (activeFilter === 'Vše' || task.category === activeFilter) &amp;&amp;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                                   </span>(task.internal.toLowerCase().includes(searchTerm) ||<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>task.external.toLowerCase().includes(searchTerm) ||</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>task.sku.toLowerCase().includes(searchTerm)))</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.forEach(task =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const card = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>card.className = 'task-card bg-white p-5 rounded-lg shadow-md border border-slate-200 flex flex-col';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>card.dataset.category = task.category;</p>
-<p class="p2"><span class="Apple-converted-space">                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>card.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex justify-between items-center mb-3"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="inline-block bg-sky-100 text-sky-800 text-xs font-semibold px-2.5 py-0.5 rounded-full"&gt;${task.category}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-xs font-mono bg-slate-200 text-slate-700 px-2 py-1 rounded"&gt;SK: ${task.sku}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h4 class="font-semibold text-slate-800 text-sm mb-1"&gt;Interní popis:&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-sm text-slate-600 mb-3"&gt;${task.internal}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="mt-auto pt-3 border-t border-slate-200"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h4 class="font-semibold text-slate-800 text-sm mb-1"&gt;Text pro zákazníka:&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-sm text-slate-900 font-medium"&gt;${task.external}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>tasksGrid.appendChild(card);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>function setupFilters() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const buttons = ['Vše', ...categories];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>filterButtonsContainer.innerHTML = buttons.map(category =&gt;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>`&lt;button class="filter-btn px-3 py-1.5 text-sm rounded-md transition-colors duration-200 ${category === 'Vše' ? 'active' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'}" data-category="${category}"&gt;${category}&lt;/button&gt;`</p>
-<p class="p1"><span class="Apple-converted-space">                </span>).join('');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>filterButtonsContainer.addEventListener('click', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (e.target.tagName === 'BUTTON') {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>activeFilter = e.target.dataset.category;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.querySelectorAll('.filter-btn').forEach(btn =&gt; btn.classList.remove('active', 'bg-sky-600', 'text-white'));</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>document.querySelectorAll('.filter-btn').forEach(btn =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if(btn.dataset.category !== activeFilter) {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>btn.classList.add('bg-slate-200', 'hover:bg-slate-300', 'text-slate-700')</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>e.target.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>e.target.classList.remove('bg-slate-200', 'hover:bg-slate-300', 'text-slate-700');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>renderCards();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>function setupChart() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const ctx = document.getElementById('categoryChart').getContext('2d');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const categoryCounts = categories.map(cat =&gt; serviceTasksData.filter(task =&gt; task.category === cat).length);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const chart = new Chart(ctx, {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>type: 'bar',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>data: {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>labels: categories,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>datasets: [{</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>label: 'Počet úkonů',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>data: categoryCounts,</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>backgroundColor: [</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(56, 189, 248, 0.6)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(16, 185, 129, 0.6)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(239, 68, 68, 0.6)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(245, 158, 11, 0.6)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(139, 92, 246, 0.6)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(99, 102, 241, 0.6)'</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>borderColor: [</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(14, 165, 233, 1)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(5, 150, 105, 1)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(220, 38, 38, 1)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(217, 119, 6, 1)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(124, 58, 237, 1)',</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>'rgba(79, 70, 229, 1)'</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>borderWidth: 1</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}]</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>options: {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>indexAxis: 'y',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>responsive: true,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>maintainAspectRatio: false,</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>plugins: {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>legend: {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>display: false</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>tooltip: {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>callbacks: {</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>label: function(context) {</p>
-<p class="p1"><span class="Apple-converted-space">                                        </span>return ` Počet úkonů: ${context.raw}`;</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>scales: {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>x: {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>beginAtZero: true,</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>title: {</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>display: true,</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>text: 'Počet definovaných úkonů'</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>onClick: (e, elements) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if (elements.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>const clickedIndex = elements[0].index;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>const category = categories[clickedIndex];</p>
-<p class="p2"><span class="Apple-converted-space">                                </span></p>
-<p class="p1"><span class="Apple-converted-space">                                </span>const button = document.querySelector(`.filter-btn[data-category="${category}"]`);</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>if(button) {</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>button.click();</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>searchInput.addEventListener('input', renderCards);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderCards();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupFilters();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setupChart();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<body class="text-slate-800">
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        <aside class="w-full lg:w-64 bg-white lg:border-r border-b lg:border-b-0 border-slate-200 flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-slate-900">Servisní Manuál</h1>
+                <p class="text-sm text-slate-500">Interaktivní Příručka</p>
+            </div>
+            <nav id="main-nav" class="flex flex-row lg:flex-col p-3 lg:p-4 space-x-2 lg:space-x-0 lg:space-y-2">
+                <a href="#basics" class="nav-link active text-sm lg:text-base p-3 rounded-lg flex items-center"><span class="w-6 h-6 mr-3">🛡️</span> Základy</a>
+                <a href="#consoles" class="nav-link text-sm lg:text-base p-3 rounded-lg flex items-center"><span class="w-6 h-6 mr-3">🎮</span> Herní Konzole</a>
+                <a href="#iphone" class="nav-link text-sm lg:text-base p-3 rounded-lg flex items-center"><span class="w-6 h-6 mr-3">📱</span> Apple iPhone</a>
+                <a href="#exam" class="nav-link text-sm lg:text-base p-3 rounded-lg flex items-center"><span class="w-6 h-6 mr-3">🏆</span> Závěrečná Zkouška</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <div id="content-area">
+                <!-- Content will be injected here by JavaScript -->
+            </div>
+        </main>
+    </div>
+
+    <template id="basics-template">
+        <div class="main-content">
+            <h2 class="text-3xl font-bold mb-2 text-slate-900">Část 1: Základy Profesionálního Technika</h2>
+            <p class="mb-6 text-slate-600">Zde jsou položeny fundamentální základy, které tvoří kulturu bezpečného a profesionálního pracoviště. Zvládnutí této části je absolutní podmínkou pro pokračování.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="content-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-3">🛡️ Bezpečnost na Prvním Místě: BOZP a ESD</h3>
+                        <p class="text-slate-600 mb-4">Pochopení a dodržování bezpečnostních norem není doporučení, ale zákonná a profesionální povinnost. Chráníte tím sebe, zákazníka i vybavení.</p>
+                        <div class="accordion">
+                            <div class="accordion-header flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <span class="font-semibold">Právní rámec BOZP v ČR</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t">
+                                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                                    <li><strong>Povinnosti zaměstnavatele:</strong> Zajistit bezpečné pracoviště a revidované nástroje (Zákon č. 309/2006 Sb.).</li>
+                                    <li><strong>Povinnosti technika:</strong> Maximální soustředěnost, dodržování postupů, hlášení závad.</li>
+                                    <li><strong>"Pět Bezpečnostních Pravidel":</strong> Úplně odpojit, zajistit, ověřit beznapěťový stav, uzemnit, oddělit.</li>
+                                    <li><strong>Kvalifikace:</strong> Znát hranice svých kompetencí (Nařízení vlády č. 194/2022 Sb.).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="accordion mt-3">
+                            <div class="accordion-header flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <span class="font-semibold">Prevence Elektrostatického Výboje (ESD)</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t">
+                                <p class="mb-2">ESD je tichý zabiják elektroniky. Výboj, který cítíte, má ~3500V. Citlivý čip zničí i napětí pod 10V.</p>
+                                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                                    <li><strong>Princip:</strong> Vzniká třením, lidské tělo je hlavní generátor.</li>
+                                    <li><strong>Následky:</strong> Okamžité selhání nebo latentní poškození (selže později u zákazníka).</li>
+                                    <li><strong>Řešení:</strong> Práce výhradně v EPA (Electrostatic Protected Area).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                     <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-3">🛠️ Vytvoření Bezpečného Pracoviště (EPA)</h3>
+                        <p class="text-slate-600 mb-4">EPA je zóna, kde jsou všechny předměty na stejném elektrickém potenciálu (uzemněné), čímž se brání vzniku ESD.</p>
+                         <h4 class="font-semibold mb-2">Denní a týdenní checklist funkčnosti EPA:</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm text-left text-slate-500">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                                    <tr><th scope="col" class="px-4 py-2">Komponenta</th><th scope="col" class="px-4 py-2">Interval</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b"><td class="px-4 py-2 font-medium text-slate-900">Antistatický náramek</td><td class="px-4 py-2">Denně</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-4 py-2 font-medium text-slate-900">ESD podložka na stole</td><td class="px-4 py-2">Denně</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-4 py-2 font-medium text-slate-900">Uzemňovací kabely</td><td class="px-4 py-2">Týdně</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-4 py-2 font-medium text-slate-900">Společný uzemňovací bod (EBP)</td><td class="px-4 py-2">Týdně</td></tr>
+                                    <tr class="bg-white"><td class="px-4 py-2 font-medium text-slate-900">Vlhkost vzduchu (40-60%)</td><td class="px-4 py-2">Průběžně</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
+            <div class="content-card mt-6">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">🔬 Umění Diagnostiky: Diagnostický Trychtýř</h3>
+                    <p class="text-slate-600 mb-6">Efektivní oprava začíná přesnou diagnostikou. Postupujte vždy od nejjednoduššího kroku ke složitějším. Tento systematický přístup šetří čas a předchází chybám.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="text-center">
+                            <div class="step-circle bg-blue-500 mx-auto">1</div>
+                            <p class="mt-2 font-semibold">Rozhovor</p><p class="text-sm text-slate-500">se zákazníkem</p>
+                        </div>
+                        <div class="step-arrow hidden md:block">→</div>
+                        <div class="step-arrow md:hidden">↓</div>
+                        <div class="text-center">
+                            <div class="step-circle bg-sky-500 mx-auto">2</div>
+                            <p class="mt-2 font-semibold">Vizuální kontrola</p><p class="text-sm text-slate-500">Pády, kapalina</p>
+                        </div>
+                        <div class="step-arrow hidden md:block">→</div>
+                        <div class="step-arrow md:hidden">↓</div>
+                        <div class="text-center">
+                            <div class="step-circle bg-teal-500 mx-auto">3</div>
+                            <p class="mt-2 font-semibold">SW Kroky</p><p class="text-sm text-slate-500">Restart, update</p>
+                        </div>
+                        <div class="step-arrow hidden md:block">→</div>
+                        <div class="step-arrow md:hidden">↓</div>
+                        <div class="text-center">
+                            <div class="step-circle bg-emerald-500 mx-auto">4</div>
+                            <p class="mt-2 font-semibold">Měření</p><p class="text-sm text-slate-500">Multimetr</p>
+                        </div>
+                        <div class="step-arrow hidden md:block">→</div>
+                        <div class="step-arrow md:hidden">↓</div>
+                        <div class="text-center">
+                            <div class="step-circle bg-amber-500 mx-auto">5</div>
+                            <p class="mt-2 font-semibold">Demontáž</p><p class="text-sm text-slate-500">Interní inspekce</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="consoles-template">
+        <div class="main-content">
+            <h2 class="text-3xl font-bold mb-2 text-slate-900">Část 2: Herní Konzole a Ovladače</h2>
+            <p class="mb-6 text-slate-600">Aplikace základních principů na vysoce výkonné počítače, kde je klíčový management tepla a pochopení softwarového párování komponent.</p>
+            
+            <div class="content-card">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">📊 Porovnání Typických Závad Konzolí</h3>
+                    <p class="text-slate-600 mb-4">Následující graf ukazuje relativní četnost nejčastějších závad u jednotlivých generací konzolí. Přepínáním zobrazíte data pro konkrétní platformu.</p>
+                    <div class="flex flex-wrap justify-center gap-2 mb-4">
+                        <button id="btn-ps4" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">PlayStation 4</button>
+                        <button id="btn-ps5" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-lg hover:bg-slate-300 focus:outline-none">PlayStation 5</button>
+                        <button id="btn-xboxone" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-lg hover:bg-slate-300 focus:outline-none">Xbox One</button>
+                        <button id="btn-xboxseries" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-lg hover:bg-slate-300 focus:outline-none">Xbox Series S/X</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="consoleFaultsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="content-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-3">🔧 Klíčové Opravy Konzolí</h3>
+                        <div class="accordion">
+                            <div class="accordion-header flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <span class="font-semibold">Standardní údržba (Čištění, Pasty)</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t">
+                                <p class="text-slate-600">Nejlepší prevence. Zahrnuje kompletní demontáž, vyčištění chladiče a ventilátoru od prachu a výměnu staré teplovodivé pasty (u PS5 tekutého kovu s extrémní opatrností).</p>
+                            </div>
+                        </div>
+                        <div class="accordion mt-3">
+                            <div class="accordion-header flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <span class="font-semibold">Výměna optické mechaniky</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t">
+                                <p class="text-slate-600">Kritický krok: řídící deska mechaniky je "spárována" se základní deskou. Je nutné přendat původní řídící desku do nové mechaniky, což vyžaduje pájení.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-3">🕹️ Opravy Ovladačů</h3>
+                        <div class="accordion">
+                            <div class="accordion-header flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <span class="font-semibold">Fenomén "Drift"</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t">
+                                <p class="text-slate-600">Samovolný pohyb páčky. Postup opravy:</p>
+                                <ol class="list-decimal list-inside mt-2 space-y-1">
+                                    <li>Rekalibrace v menu konzole.</li>
+                                    <li>Čištění čističem kontaktů.</li>
+                                    <li>Výměna celého modulu páčky (vyžaduje pájení).</li>
+                                </ol>
+                            </div>
+                        </div>
+                         <div class="accordion mt-3">
+                            <div class="accordion-header flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                                <span class="font-semibold">Výměna baterií a tlačítek</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t">
+                                <p class="text-slate-600">Výměna baterie je obvykle jednoduchá modulární operace. Opotřebené gumové membrány pod tlačítky nebo mikrospínače lze také vyměnit.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="iphone-template">
+        <div class="main-content">
+            <h2 class="text-3xl font-bold mb-2 text-slate-900">Část 3: Specializační Modul – Apple iPhone</h2>
+            <p class="mb-6 text-slate-600">Opravy iPhonů vyžadují maximální preciznost a pochopení softwarového párování komponent, které Apple používá k ovlivnění opravitelnosti.</p>
+            
+            <div class="content-card">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3">⚠️ Kritická Rizika a Omezení Oprav</h3>
+                    <p class="text-slate-600 mb-4">Technik musí být schopen zákazníkovi srozumitelně vysvětlit, proč se po opravě mohou objevit varovné hlášky, a že to není chyba servisu. Transparentnost je klíčová.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="border border-red-200 bg-red-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-red-800">Nefunkční Face ID</h4>
+                            <p class="text-sm text-red-700 mt-1">Při poškození flex kabelu senzorů během výměny displeje přestane Face ID trvale a nenávratně fungovat. Opravu může provést pouze Apple.</p>
+                        </div>
+                        <div class="border border-amber-200 bg-amber-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-800">Ztráta True Tone</h4>
+                            <p class="text-sm text-amber-700 mt-1">Tato funkce je vázána na data v původním displeji. Lze ji obnovit pouze pomocí speciálního programátoru, který data překopíruje.</p>
+                        </div>
+                        <div class="border border-yellow-200 bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-yellow-800">Hláška o Neoriginálním Dílu</h4>
+                            <p class="text-sm text-yellow-700 mt-1">U novějších iPhonů (XS a výše) se po výměně baterie či displeje zobrazí varování, i když je použit originální díl. Kondice baterie se nezobrazí.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="content-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-3">🔋 Výměna Baterie</h3>
+                         <ol class="list-decimal list-inside space-y-2 text-slate-600">
+                            <li>Doporučit zálohu, ověřit vypnutí "Find My".</li>
+                            <li>Vybít baterii pod 25 % (bezpečnost).</li>
+                            <li>Odstranit pentalobe šrouby, zahřát okraje.</li>
+                            <li>Opatrně otevřít, odpojit baterii jako PRVNÍ.</li>
+                            <li>Odstranit lepicí pásky, vyměnit baterii.</li>
+                            <li>Informovat zákazníka o možné servisní hlášce.</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-3">📱 Výměna Displeje</h3>
+                         <ol class="list-decimal list-inside space-y-2 text-slate-600">
+                            <li>Stejný postup otevření jako u baterie.</li>
+                            <li>Odpojit konektory displeje.</li>
+                            <li>**Kritický krok:** Opatrně přenést sestavu horního reproduktoru a senzorů z původního displeje na nový.</li>
+                            <li>Složit a otestovat všechny funkce.</li>
+                            <li>Informovat o rizicích (Face ID, True Tone).</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <template id="exam-template">
+        <div class="main-content">
+            <h2 class="text-3xl font-bold mb-2 text-slate-900">Část 4: Závěrečná Zkouška a Další Rozvoj</h2>
+            <p class="mb-6 text-slate-600">Ověření nabytých dovedností v reálném scénáři a nastínění cesty k celoživotnímu vzdělávání.</p>
+
+            <div class="content-card">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3">🏆 Praktická Zkouška: Reálný Servisní Případ</h3>
+                    <p class="text-slate-600 mb-4">Absolvent obdrží zařízení s neznámou závadou a jeho úkolem je projít kompletním procesem od A do Z.</p>
+                    <ul class="list-decimal list-inside space-y-3">
+                        <li><span class="font-semibold">Příjem a Komunikace:</span> Vedení rozhovoru s "fiktivním zákazníkem", kladení správných diagnostických otázek.</li>
+                        <li><span class="font-semibold">Diagnostika:</span> Samostatná aplikace diagnostického trychtýře, formulace hypotézy.</li>
+                        <li><span class="font-semibold">Plán a Nabídka:</span> Návrh postupu, identifikace dílů, stanovení ceny a vysvětlení rizik.</li>
+                        <li><span class="font-semibold">Provedení Opravy:</span> Samostatný servisní zásah v souladu se všemi standardy (BOZP, ESD).</li>
+                        <li><span class="font-semibold">Výstupní Testování:</span> Komplexní test všech funkcí pro ověření úspěšnosti opravy.</li>
+                        <li><span class="font-semibold">Dokumentace a Předání:</span> Vyplnění servisního protokolu a vysvětlení provedené práce.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card mt-6">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-3">📚 Celoživotní Vzdělávání Technika</h3>
+                    <p class="text-slate-600 mb-4">Technologie se vyvíjí extrémně rychle. Profesionální technik se musí neustále vzdělávat.</p>
+                    <p class="font-semibold">Doporučené Zdroje:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-slate-600">
+                        <li>Weby jako iFixit pro nové návody a teardowny.</li>
+                        <li>Komunitní fóra (např. Reddit r/mobilerepair).</li>
+                        <li>Renomované YouTube kanály zaměřené na opravy.</li>
+                        <li>Sledování novinek přímo od výrobců.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const contentArea = document.getElementById('content-area');
+    let consoleChart = null;
+
+    const templates = {
+        'basics': document.getElementById('basics-template').innerHTML,
+        'consoles': document.getElementById('consoles-template').innerHTML,
+        'iphone': document.getElementById('iphone-template').innerHTML,
+        'exam': document.getElementById('exam-template').innerHTML
+    };
+
+    function navigate(hash) {
+        const section = hash.substring(1);
+        
+        contentArea.style.opacity = 0;
+        
+        setTimeout(() => {
+            contentArea.innerHTML = templates[section] || templates['basics'];
+            
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === hash);
+            });
+            
+            if (section === 'consoles') {
+                initConsoleChart();
+            }
+            
+            initAccordions();
+            contentArea.style.opacity = 1;
+        }, 300);
+    }
+
+    function initAccordions() {
+        const accordions = contentArea.querySelectorAll('.accordion');
+        accordions.forEach(accordion => {
+            const header = accordion.querySelector('.accordion-header');
+            const content = accordion.querySelector('.accordion-content');
+            const arrow = header.querySelector('span:last-child');
+
+            header.addEventListener('click', () => {
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    arrow.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    arrow.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    }
+
+    function initConsoleChart() {
+        const ctx = document.getElementById('consoleFaultsChart')?.getContext('2d');
+        if (!ctx) return;
+
+        const chartData = {
+            ps4: {
+                labels: ['Přehřívání', 'Vadný HDD', 'Vadná Mechanika', 'Poškozený HDMI', 'BLOD'],
+                data: [45, 25, 15, 10, 5],
+                bgColor: 'rgba(0, 114, 206, 0.6)',
+                borderColor: 'rgba(0, 114, 206, 1)',
+            },
+            ps5: {
+                labels: ['Problém s napájením', 'Poškozený HDMI', 'Přehřívání', 'Chyba mechaniky', 'SW Chyba'],
+                data: [35, 30, 15, 10, 10],
+                bgColor: 'rgba(200, 200, 200, 0.6)',
+                borderColor: 'rgba(150, 150, 150, 1)',
+            },
+            xboxone: {
+                labels: ['Vadný zdroj', 'Vadný HDD (E10x)', 'Poškozený HDMI', 'Chyba mechaniky', 'Přehřívání'],
+                data: [30, 25, 20, 15, 10],
+                bgColor: 'rgba(16, 124, 16, 0.6)',
+                borderColor: 'rgba(16, 124, 16, 1)',
+            },
+            xboxseries: {
+                labels: ['Náhlé vypínání', 'Poškozený HDMI', 'SW Chyba', 'Přehřívání', 'Vadné úložiště'],
+                data: [30, 25, 20, 15, 10],
+                bgColor: 'rgba(100, 100, 100, 0.6)',
+                borderColor: 'rgba(50, 50, 50, 1)',
+            }
+        };
+
+        if (consoleChart) {
+            consoleChart.destroy();
+        }
+
+        consoleChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.ps4.labels,
+                datasets: [{
+                    label: 'Četnost závad (%)',
+                    data: chartData.ps4.data,
+                    backgroundColor: chartData.ps4.bgColor,
+                    borderColor: chartData.ps4.borderColor,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 50,
+                        ticks: {
+                            callback: function(value) {
+                                return value + "%"
+                            }
+                        }
+                    },
+                    y: {
+                        ticks: {
+                           autoSkip: false,
+                           maxRotation: 0,
+                           minRotation: 0,
+                           callback: function(value) {
+                                let label = this.getLabelForValue(value);
+                                if (label.length > 16) {
+                                    return label.slice(0, 16) + '...';
+                                }
+                                return label;
+                           }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.dataset.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const buttons = {
+            'btn-ps4': 'ps4',
+            'btn-ps5': 'ps5',
+            'btn-xboxone': 'xboxone',
+            'btn-xboxseries': 'xboxseries'
+        };
+
+        Object.keys(buttons).forEach(btnId => {
+            const button = document.getElementById(btnId);
+            button.addEventListener('click', (e) => {
+                const platform = buttons[btnId];
+                consoleChart.data.labels = chartData[platform].labels;
+                consoleChart.data.datasets[0].data = chartData[platform].data;
+                consoleChart.data.datasets[0].backgroundColor = chartData[platform].bgColor;
+                consoleChart.data.datasets[0].borderColor = chartData[platform].borderColor;
+                consoleChart.update();
+                
+                document.querySelectorAll('.chart-container button').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-slate-200', 'text-slate-700');
+                });
+                e.target.classList.add('bg-blue-600', 'text-white');
+                e.target.classList.remove('bg-slate-200', 'text-slate-700');
+            });
+        });
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const hash = e.currentTarget.getAttribute('href');
+            window.location.hash = hash;
+        });
+    });
+
+    window.addEventListener('hashchange', () => {
+        navigate(window.location.hash || '#basics');
+    });
+
+    navigate(window.location.hash || '#basics');
+});
+</script>
+
 </body>
 </html>
